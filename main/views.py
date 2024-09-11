@@ -2,7 +2,9 @@ from django.shortcuts import render
 
 def show_main(request):
     context = {
-        'name' : 'Workshirt',
+        'name'  : 'Muhammad Luthfi Febriyan',
+        'class' : 'PBP B',
+        'product' : 'Workshirt',
         'price': 'Rp 399.000',
         'description': 'Workshirt dengan bahan fleece'
     }

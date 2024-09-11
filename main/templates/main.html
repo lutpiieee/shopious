@@ -1,6 +1,34 @@
-<h5>Nama Produk: </h5>
-<p>{{ name }}</p>
-<h5>Harga Produk: </h5>
-<p>{{ price }}</p>
-<h5>Deskripsi Produk: </h5>
-<p>{{ description }}</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Information</title>
+    <style>
+        .grey-box {
+            background-color: #f0f0f0; /* Light grey background */
+            padding: 10px 10px; /* Less padding vertically, normal padding horizontally */
+            margin: 5px 0; /* Maintain some margin around the box */
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 100%; /* Ensure the width is like the original */
+            box-sizing: border-box; /* Ensure padding doesn't affect the width */
+            font-size: 16px; /* Adjust the font size */
+            height: 40px; /* Automatically adjust height based on content */
+        }
+    </style>
+</head>
+<body>
+    <!-- Grey box with reduced height but full width -->
+    <div class="grey-box">
+        <h5>{{ name }} - {{ class }}</h5>
+    </div>
+
+    <!-- Other product details -->
+    <h5>Nama Produk:</h5>
+    <p>{{ product }}</p>
+    <h5>Harga Produk:</h5>
+    <p>{{ price }}</p>
+    <h5>Deskripsi Produk:</h5>
+    <p>{{ description }}</p>
+</body>
