@@ -18,7 +18,6 @@ class mainTest(TestCase):
     def test_review_item(self):
         now = timezone.now()
         itemReviewed = ReviewItem.objects.create(
-          username="halodek96",
           time = now,
           review = "senang sih, cuman tadi sepatu aku basah kena hujan :(",
           intensity = 8,
