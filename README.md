@@ -1,4 +1,4 @@
-ï»¿# SHOPIOUS!
+ÿþï»¿# SHOPIOUS!
 by Muhammad Luthfi Febriyan - 2306245913
 Pengembangan Berbasis Platform 2024/2025
 https://pbp.cs.ui.ac.id/muhammad.luthfi39/shopiouss
@@ -31,7 +31,7 @@ urllib3
 
 8. menambahkan 'main' ke daftar INSTALLED_APPS di file settings.py untuk menandakan kehadiran aplikasi tersebut. 
 
-9. membuat template, saya membuat direktori templates (di dalam direktori main) dan menambahkan file main.html yang akan menjadi template. Saya mengisi template dengan komponen yang diperlukan (nama aplikasi, nama, kelas). 
+9. membuat template, saya membuat direktori templates (di dalam direktori maindan menambahkan file main.html yang akan menjadi template. Saya mengisi template dengan komponen yang diperlukan (nama aplikasi, nama, kelas). 
 
 10. menambahkan model di file models.py bernama Product, yang memiliki atribut name, price, dan description 
 
@@ -235,7 +235,7 @@ def show_json(request):
 
 def show_xml_by_id(request, id):
     data = ReviewItem.objects.filter(pk=id)
-    return HttpResponse(serializers.serialize("xml", data), content_type="application/xml")    
+    return HttpResponse(serializers.serialize("xml", data), content_type="application/xml"   
 
 def show_json_by_id(request, id):
     data = ReviewItem.objects.filter(pk=id)
@@ -258,11 +258,11 @@ urlpatterns = [
 <details>
 <summary> <b> Tugas 4 </b> </summary>
     
-**Apa perbedaan antara HttpResponseRedirect() dan redirect()**
+**Apa perbedaan antara HttpResponseRedirect(dan redirect()**
 - HttpResponseRedirect():
   Mengembalikan respons HTTP 302 untuk mengarahkan ke URL yang ditentukan. Berguna jika Anda memerlukan lebih banyak kontrol atas respons sebelum mengembalikannya.
 - redirect():
-  Menggunakan HttpResponseRedirect() secara internal. Lebih praktis karena dapat menerima berbagai parameter (URL, pola URL yang diberi nama, atau instance model).
+  Menggunakan HttpResponseRedirect(secara internal. Lebih praktis karena dapat menerima berbagai parameter (URL, pola URL yang diberi nama, atau instance model).
   
 **Jelaskan cara kerja penghubungan model Product dengan User!**
 Cara kerja penghubungan model Product (ReviewEntry) dengan User di Django dilakukan menggunakan ForeignKey. Di dalam Django, hubungan antara dua model dapat diimplementasikan menggunakan relasi database. 
@@ -436,7 +436,7 @@ Memaksa pengguna login sebelum mengakses website, kemudian mengimpor login_requi
 8. Membuat Akun Pengguna dan Data Uji:
 Membuat dua akun di halaman saya, yaitu "lutpiieee" dan "ziajam" serta menambahkan beberapa entri review.
 
-9. Menghubungkan Model Product (ReviewEntry) dengan User:
+9. Menghubungkan Model Product (ReviewEntrydengan User:
 Di models.py, mengimpor User dan memodifikasi kelas ReviewEntry dengan menambahkan:
 ```
 user = models.ForeignKey(User, on_delete=models.CASCADE)
