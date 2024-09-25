@@ -254,3 +254,208 @@ urlpatterns = [
 ```
 11. Terakhir, saya menerapkan perubahan yang saya buat ke PWS dan GitHub. Selesai!
 </details>
+
+<details>
+<summary> <b> Tugas 4 </b> </summary>
+    
+**Apa perbedaan antara HttpResponseRedirect() dan redirect()**
+- HttpResponseRedirect():
+  Mengembalikan respons HTTP 302 untuk mengarahkan ke URL yang ditentukan. Berguna jika Anda memerlukan lebih banyak kontrol atas respons sebelum mengembalikannya.
+- redirect():
+  Menggunakan HttpResponseRedirect() secara internal. Lebih praktis karena dapat menerima berbagai parameter (URL, pola URL yang diberi nama, atau instance model).
+  
+**Jelaskan cara kerja penghubungan model Product dengan User!**
+Cara kerja penghubungan model Product (ReviewEntry) dengan User di Django dilakukan menggunakan ForeignKey. Di dalam Django, hubungan antara dua model dapat diimplementasikan menggunakan relasi database. 
+'''
+ForeignKey(User, on_delete=models.CASCADE)
+'''
+Pengguna hanya dapat melihat dan mengelola entri BookEntry yang terkait dengan akun mereka.
+Jika pengguna dihapus, semua entri yang terkait dengan pengguna tersebut juga akan dihapus dari database.
+Dengan pendekatan ini, Django memastikan bahwa setiap entri produk dikaitkan dengan pengguna tertentu, sehingga data produk dapat dikelola berdasarkan pengguna yang sedang login.
+
+**Apa perbedaan antara authentication dan authorization, apakah yang dilakukan saat pengguna login? Jelaskan bagaimana Django mengimplementasikan kedua konsep tersebut.**'
+- Authentication: Proses memverifikasi identitas pengguna, seperti memasukkan username dan password.
+- Authorization: Menentukan sumber daya atau tindakan yang diizinkan bagi pengguna setelah mereka terautentikasi.
+
+**Bagaimana Django mengingat pengguna yang telah login? Jelaskan kegunaan lain dari cookies dan apakah semua cookies aman digunakan?**
+Django menggunakan sesi yang disimpan dalam cookies. Setelah login, Django membuat sesi, menyimpan ID sesi, dan mengirimkan cookie sessionid ke browser pengguna.
+
+**IMPLEMENTASI PROGRAM**
+1. Aktivasi Virtual Environment: Saya mengaktifkan lingkungan virtual dengan menjalankan perintah:
+```
+source env/bin/activate
+```
+2. Mengimpor di views.py:
+Mengimpor UserCreationForm untuk mengimplementasikan fungsi register.
+AuthenticationForms, authenticate, dan login untuk mengimplementasikan fungsi login.
+logout untuk mengimplementasikan fungsi logout.
+datetime, HttpResponseRedirect, dan reverse untuk menggunakan cookies.
+
+Kemudian, menambahkan tiga fungsi tersebut (register, login, logout) di file views.py:
+```
+def register(request):
+    form = UserCreationForm()
+
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your account has been successfully created!')
+            return redirect('main:login')
+    context = {'form':form}
+    return render(request, 'register.html', context)
+```
+```
+def login_user(request):
+   if request.method == 'POST':
+      form = AuthenticationForm(data=request.POST)
+
+      if form.is_valid():
+        user = form.get_user()
+        login(request, user)
+        response = HttpResponseRedirect(reverse("main:show_main"))
+        response.set_cookie('last_login', str(datetime.datetime.now()))
+        return response
+
+   else:
+      form = AuthenticationForm(request)
+   context = {'form': form}
+   return render(request, 'login.html', context)
+```
+def logout_user(request):
+    logout(request)
+    response = HttpResponseRedirect(reverse('main:login'))
+    response.delete_cookie('last_login')
+    return response
+```
+
+3. Menggunakan Cookies:
+Menggunakan cookies saat login, maka memodifikasi show_main:
+```
+def show_main(request):
+    ...
+                'last_login': request.COOKIES['last_login'],
+        }
+        return render(request, "main.html", context)
+    ...
+```
+
+4.File HTML Register dan Login:
+Membuat file HTML bernama "register.html" dan "login.html" untuk menampilkan halaman register dan login.
+```
+#register html
+{% extends 'base.html' %}
+{% block meta %}
+<title>Register</title>
+{% endblock meta %}
+{% block content %}
+<div class="login">
+  <h1>Register</h1>
+
+  <form method="POST">
+    {% csrf_token %}
+    <table>
+      {{ form.as_table }}
+      <tr>
+        <td></td>
+        <td><input type="submit" name="submit" value="Register" /></td>
+      </tr>
+    </table>
+  </form>
+
+  {% if messages %}
+  <ul>
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</div>
+{% endblock content %}
+```
+```
+#login.html
+{% extends 'base.html' %}
+
+{% block meta %}
+<title>Login</title>
+{% endblock meta %}
+
+{% block content %}
+<div class="login">
+  <h1>Login</h1>
+
+  <form method="POST" action="">
+    {% csrf_token %}
+    <table>
+      {{ form.as_table }}
+      <tr>
+        <td></td>
+        <td><input class="btn login_btn" type="submit" value="Login" /></td>
+      </tr>
+    </table>
+  </form>
+
+  {% if messages %}
+  <ul>
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  Tidak punya akun?
+  <a href="{% url 'main:register' %}">Daftar Sekarang</a>
+</div>
+{% endblock content %}
+```
+
+5. Logout Button dan Tampilan Last Login di Main Page:
+Menambahkan tombol "logout" dan menampilkan data last_login di halaman utama (main.html):
+```
+<a href="{% url 'main:logout' %}">
+  <button>Logout</button>
+</a>
+
+<h5>Sesi login terakhir: {{ last_login }}</h5>
+```
+
+6. URL Routing:
+Mengimpor fungsi register, login, dan logout ke dalam urls.py dan menambahkan path berikut ke urlpatterns:
+```
+path('register/', register, name='register'),
+path('login/', login_user, name='login'),
+path('logout/', logout_user, name='logout'),
+```
+
+7. Restriksi Akses untuk Pengguna yang Belum Login:
+Memaksa pengguna login sebelum mengakses website, kemudian mengimpor login_required ke dalam views.py dan menambahkan batasan tersebut pada fungsi show_main:
+```
+@login_required(login_url='/login') #menambahkan diatas fungsi show_main
+```
+
+8. Membuat Akun Pengguna dan Data Uji:
+Membuat dua akun di halaman saya, yaitu "lutpiieee" dan "ziajam" serta menambahkan beberapa entri review.
+
+9. Menghubungkan Model Product (ReviewEntry) dengan User:
+Di models.py, mengimpor User dan memodifikasi kelas ReviewEntry dengan menambahkan:
+```
+user = models.ForeignKey(User, on_delete=models.CASCADE)
+```
+Kemudian memodifikasi create_review_entry agar bisa menyimpan user ke database sebelum menyimpan entri review. Saya tidak membuat restriksi bahwa
+tiap user tidak bisa melihat review orang lain jadi tidak ada perubahan di show_main
+```
+    form = ReviewItemForm(request.POST or None)
+
+    if form.is_valid() and request.method == "POST":
+        review_entry = form.save(commit=False)
+        review_entry.user = request.user
+        review_entry.save()
+        return redirect('main:show_main')
+
+    context = {'form': form}
+    return render(request, "create_review_entry.html", context)
+```
+
+10. Migrasi Model
+11. Push GitHub dan PWS
+</details>
