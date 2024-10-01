@@ -1,7 +1,8 @@
 from django.forms import ModelForm
-from main.models import ReviewItem
+from main.models import AddItem
 
-class ReviewItemForm(ModelForm):
+#menambahkan form baru untuk add item
+class addItemForm(ModelForm):
     class Meta:
-        model = ReviewItem
-        fields = ["review", "intensity"]
+        model = AddItem
+        fields = ["name", "photo_url", "price", "description"] 

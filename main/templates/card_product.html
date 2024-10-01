@@ -1,0 +1,32 @@
+<!-- Product Grid -->
+<div class="product-container mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+  {% if not addItem_entries %}
+    <p class="text-center text-lg text-gray-800 col-span-full">No products available yet.</p>
+  {% else %}
+    {% for item in addItem_entries %}
+    <div class="product-card bg-white shadow-md rounded-lg overflow-hidden transition-transform hover:scale-105 duration-300">
+      
+      <!-- Image Section -->
+      {% if item.photo_url %}
+        <img src="{{ item.photo_url }}" alt="{{ item.name }}" class="product-image w-full h-48 object-cover rounded-t-lg">
+      {% else %}
+        <p class="text-center text-gray-400 mb-4">No image available</p>
+      {% endif %}
+
+      <!-- Product Info Section -->
+      <div class="p-6">
+        <h3 class="text-xl font-bold text-gray-900 mb-2">{{ item.name }}</h3>
+        <p class="text-gray-600 text-sm mb-4"><strong>Description:</strong> {{ item.description|truncatewords:20 }}</p>
+        <p class="text-gray-900 text-lg font-bold"><strong>Price:</strong> {{ item.price }}</p>
+      </div>
+
+      <!-- Edit & Delete Buttons -->
+      <div class="flex justify-between px-6 pb-6">
+        <a href="{% url 'main:edit_product' item.id %}" class="text-white bg-black py-2 px-4 rounded-lg hover:bg-gray-800 transition">Edit</a>
+        <a href="{% url 'main:delete_product' item.id %}" class="text-white bg-red-500 py-2 px-4 rounded-lg hover:bg-red-600 transition">Delete</a>
+      </div>
+
+    </div>
+    {% endfor %}
+  {% endif %}
+</div>
