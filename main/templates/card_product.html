@@ -1,7 +1,13 @@
+{% load static %}
+
 <!-- Product Grid -->
-<div class="product-container mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+<div class="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 w-full max-w-7xl mx-auto"> 
+  <!-- Added grid system for better layout -->
   {% if not addItem_entries %}
-    <p class="text-center text-lg text-gray-800 col-span-full">No products available yet.</p>
+    <div class="col-span-full flex flex-col items-center justify-center">
+      <img src="{% static 'images/image.png' %}" alt="Sad face" class="w-32 h-32 mb-4 mx-auto"/>
+      <p class="text-center text-lg text-gray-800">No products available yet.</p>
+    </div>
   {% else %}
     {% for item in addItem_entries %}
     <div class="product-card bg-white shadow-md rounded-lg overflow-hidden transition-transform hover:scale-105 duration-300">

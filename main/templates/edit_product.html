@@ -5,19 +5,37 @@
 {% block content %}
 {% include 'navbar.html' %}
 
-<h1>Edit Product</h1>
+<!-- Page Title -->
+<div class="max-w-3xl mx-auto my-16">
+  <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">Edit Product</h1>
 
-<form method="POST">
+  <!-- Form Section -->
+  <form method="POST" enctype="multipart/form-data" class="bg-white p-8 rounded-lg shadow-lg">
     {% csrf_token %}
-    <table>
-        {{ form.as_table }}
-        <tr>
-            <td></td>
-            <td>
-                <input type="submit" value="Edit Product"/>
-            </td>
-        </tr>
-    </table>
-</form>
+    
+    <!-- Form Fields -->
+    <div class="space-y-6">
+      <!-- Render form fields dynamically -->
+      {% for field in form %}
+      <div class="flex flex-col">
+        <!-- Label -->
+        <label class="text-gray-700 font-semibold mb-2" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        <!-- Input Field -->
+        {{ field }}
+        
+        <!-- Error Handling -->
+        {% if field.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ field.errors }}</p>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Submit Button -->
+    <div class="mt-8">
+      <button type="submit" class="w-full bg-blue-500 text-white py-3 px-6 rounded-md font-bold text-lg hover:bg-blue-600 transition duration-300">Edit Product</button>
+    </div>
+  </form>
+</div>
 
 {% endblock %}
