@@ -605,7 +605,7 @@ Flexbox cocok untuk penyesuaian tata letak sederhana dan responsif, sementara Gr
 </details>
 
 <details>
-<summary> <b> Tugas 2 </b> </summary>
+<summary> <b> Tugas 6 </b> </summary>
 
 **Jelaskan manfaat dari penggunaan JavaScript dalam pengembangan aplikasi web!**    
 JavaScript adalah bahasa pemrograman esensial dalam pengembangan aplikasi web karena memiliki kemampuan untuk meningkatkan dinamika dan interaktivitas halaman web. Berikut adalah beberapa manfaat utama dari penggunaan JavaScript:
