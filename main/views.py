@@ -8,27 +8,26 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 import datetime
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 
 @login_required(login_url='/register')
 def show_main(request):
-    addItem_entries = AddItem.objects.all()  # Retrieve all AddItem entries
-
     context = {
-        'nama': 'Adidas Samba Nylon Wales Bonner Core Black',
+        'nama' : 'Muhammad Luthfi Febriyan',
         'harga': 'IDR 7,770,000',
         'deskripsi': 'A few months after the recognizable version, Wales Bonner and adidas reveal a new pack around the legendary Samba model. This Adidas Samba Nylon Wales Bonner Core Black presents a base in black nylon horse dressing, accompanied by a black leather mudguard. The three adidas stripes provide contrast with their white leather design, extending to the heel tab and tongue, marked by the London designer’s touch. A gum sole adds the final touch, preserving the heritage of this iconic soccer shoe.',
-        'addItem_entries': addItem_entries,  # Add this to the context
         'last_login': request.COOKIES['last_login'],
     }
 
     return render(request, "main.html", context)
 
 def show_xml(request):
-    data = AddItem.objects.all()
+    data = AddItem.objects.filter(user=request.user)
     return HttpResponse(serializers.serialize("xml", data), content_type="application/xml")
 
 def show_json(request):
-    data = AddItem.objects.all()
+    data = AddItem.objects.filter(user=request.user)
     return HttpResponse(serializers.serialize("json", data), content_type="application/json")
 
 def show_xml_by_id(request, id):
@@ -61,6 +60,8 @@ def login_user(request):
         response = HttpResponseRedirect(reverse("main:show_main"))
         response.set_cookie('last_login', str(datetime.datetime.now()))
         return response
+      else:
+        messages.error(request, "Invalid username or password. Please try again.")
 
    else:
       form = AuthenticationForm(request)
@@ -77,12 +78,37 @@ def create_add_item(request):
     form = addItemForm(request.POST or None)
 
     if form.is_valid() and request.method == "POST":
+        new_item = form.save(commit=False)
+        new_item.user = request.user
         form.save()
         return redirect('main:show_main')
 
     context = {'form': form}
     return render(request, "add_item_form.html", context)
 
+
+@csrf_exempt
+@require_POST
+def add_item_entry_ajax(request):
+    if request.user.is_authenticated:
+        name = request.POST.get("name")
+        photo_url = request.POST.get("photo_url")
+        price = request.POST.get("price")
+        description = request.POST.get("description")
+
+        # Pastikan user diset pada item yang dibuat
+        new_item = AddItem(
+            name=name,
+            photo_url=photo_url,
+            price=price,
+            description=description,
+            user=request.user  # Set user dari request yang login
+        )
+        new_item.save()
+
+        return HttpResponse("CREATED", status=201)
+    else:
+        return HttpResponse("Unauthorized", status=401)
 
 def product_detail(request, product_id):
     product = get_object_or_404(AddItem, id=product_id)
