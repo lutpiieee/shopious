@@ -643,5 +643,149 @@ Pengecualian CSRF ini memungkinkan permintaan AJAX untuk diproses, namun penggun
 
 Pembersihan data input pengguna di backend sangat penting dan tidak bisa sepenuhnya digantikan oleh validasi di frontend. Frontend dapat dengan mudah dimanipulasi, misalnya dengan menonaktifkan JavaScript atau menggunakan alat seperti Postman, sehingga backend harus memastikan keamanan dan validitas data sebelum diproses lebih lanjut. Pembersihan di backend juga menjaga integritas data, memastikan semua data yang masuk memenuhi standar yang ditetapkan dan melindungi dari serangan seperti SQL injection atau XSS. Selain itu, backend memungkinkan validasi yang lebih kompleks, seperti pemeriksaan aturan bisnis atau akses database, yang tidak dapat dilakukan di frontend. Ini juga mengurangi beban pada frontend, membuat aplikasi lebih ringan dan responsif. Dengan demikian, pembersihan data di backend tidak hanya meningkatkan keamanan, tetapi juga menjaga kualitas data dan efisiensi aplikasi.
 
+**IMPLEMENTASI PROGRAM**
+1. Modifikasi Kode Cards untuk Menggunakan AJAX GET
+   ```
+   <div id="product_cards"></div>
+   dan
+     function addItemEntry() {
+    const form = document.getElementById('addItemForm');
+    fetch("{% url 'main:add_item_entry_ajax' %}", {
+        method: "POST",
+        body: new FormData(form),
+    })
+    .then(response => {
+        if (response.ok) {
+            refreshItemEntries(); // Memperbarui daftar produk setelah berhasil menambah
+            form.reset(); // Reset form
+            hideModal(); // Tutup modal
+        } else {
+            console.error('Failed to add item');
+        }
+    })
+    .catch(error => console.error('Error:', error));
 
+    return false; // Mencegah halaman dari refresh
+   ```
+2. Mengambil Data Menggunakan AJAX GET Pastikan data yang diambil hanya milik pengguna yang sedang login. Kode berikut dalam views.py memastikan bahwa data yang diambil telah difilter untuk pengguna yang login
+   ```
+   data = Product.objects.filter(user=request.user)
+   ```
+3. Membuat Tombol untuk Membuka Modal dengan Form untuk Menambahkan Produk Pada file main.html, kita setup modal yang berisi form untuk memasukkan detail produk
+```
+<div id="crudModal" tabindex="-1" aria-hidden="true" class="hidden fixed inset-0 z-50 w-full flex items-center justify-center bg-gray-800 bg-opacity-50 overflow-x-hidden overflow-y-auto transition-opacity duration-300 ease-out">
+    <div id="crudModalContent" class="relative bg-white rounded-lg shadow-lg w-5/6 sm:w-3/4 md:w-1/2 lg:w-1/3 mx-4 sm:mx-0 transform scale-95 opacity-0 transition-transform transition-opacity duration-300 ease-out">
+      <!-- Modal header -->
+      <div class="flex items-center justify-between p-4 border-b rounded-t">
+        <h3 class="text-xl font-semibold text-gray-900">Add New Product</h3>
+        <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center" id="closeModalBtn">
+          <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+          </svg>
+          <span class="sr-only">Close modal</span>
+        </button>
+      </div>
+      <!-- Modal body -->
+      <div class="px-6 py-4 space-y-6 form-style">
+        <form id="addItemForm" action="{% url 'main:create_add_item' %}" method="POST" onsubmit="return addItemEntry();">
+          {% csrf_token %}
+          <div class="mb-4">
+              <label for="name" class="block text-sm font-medium text-gray-700">Product Name</label>
+              <input type="text" id="name" name="name" class="mt-1 block w-full border border-gray-300 rounded-md p-2 hover:border-indigo-700" placeholder="Enter product name" required>
+          </div>
+          <div class="mb-4">
+              <label for="photo_url" class="block text-sm font-medium text-gray-700">Photo URL</label>
+              <input type="url" id="photo_url" name="photo_url" class="mt-1 block w-full border border-gray-300 rounded-md p-2 hover:border-indigo-700" placeholder="Enter photo URL" required>
+          </div>
+          <div class="mb-4">
+              <label for="price" class="block text-sm font-medium text-gray-700">Price</label>
+              <input type="number" id="price" name="price" class="mt-1 block w-full border border-gray-300 rounded-md p-2 hover:border-indigo-700" placeholder="Enter price" required step="0.01">
+          </div>
+          <div class="mb-4">
+              <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+              <textarea id="description" name="description" rows="3" class="mt-1 block w-full h-52 resize-none border border-gray-300 rounded-md p-2 hover:border-indigo-700" placeholder="Enter product description" required></textarea>
+          </div>
+      </form>
+      </div>
+      <!-- Modal footer -->
+      <div class="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2 p-6 border-t border-gray-200 rounded-b justify-center md:justify-end">
+        <button type="button" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg" id="cancelButton">Cancel</button>
+        <button type="submit" form="addItemForm" class="bg-indigo-700 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg">Save</button>
+      </div>
+    </div>
+  </div>
+```
+
+4. Untuk membuat tombol yang memicu modal, tambahkan tombol berikut pada main.html:
+```
+function showModal() {
+      const modal = document.getElementById('crudModal');
+      const modalContent = document.getElementById('crudModalContent');
+
+      modal.classList.remove('hidden'); 
+      setTimeout(() => {
+        modalContent.classList.remove('opacity-0', 'scale-95');
+        modalContent.classList.add('opacity-100', 'scale-100');
+      }, 50); 
+  }
+
+  function hideModal() {
+      const modal = document.getElementById('crudModal');
+      const modalContent = document.getElementById('crudModalContent');
+
+      modalContent.classList.remove('opacity-100', 'scale-100');
+      modalContent.classList.add('opacity-0', 'scale-95');
+
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 150); 
+  }
+
+  document.getElementById("cancelButton").addEventListener("click", hideModal);
+  document.getElementById("closeModalBtn").addEventListener("click", hideModal);
+```
+5. Membuat Fungsi View Baru untuk Menambahkan Produk Baru ke Database dan membuat routing Path yang mengarah ke Fungsi View Baru Tambahkan rute pada urls.py
+6. Menyambungkan Form di Dalam Modal ke Path /create-item-ajax/ Buat fungsi ke dalam <script> untuk menyambungkan form dengan path create products ajax
+7. Melakukan Refresh Asinkron pada Halaman Utama Tambahkan kode berikut di main.html untuk memuat daftar item terbaru tanpa me-reload seluruh halaman:
+```
+async function refreshItemEntries() {
+    document.getElementById("item_entry_cards").innerHTML = "";
+    document.getElementById("item_entry_cards").className = "";
+    const itemEntries = await getItemEntries();
+    let htmlString = "";
+    let classNameString = "";
+
+    if (itemEntries.length === 0) {
+        classNameString = "flex flex-col items-center justify-center min-h-[24rem] p-6";
+        htmlString = `
+            <div class="flex flex-col items-center justify-center min-h-[24rem] p-6">
+              <img src="{% static 'images/image.png' %}" alt="Sad face" class="w-32 h-32 mb-4"/>
+              <p class="text-center text-gray-600 mt-4">No products available yet.</p>
+            </div>
+        `;
+    }
+    else {
+        classNameString = "columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6 w-full";
+        itemEntries.forEach((item) => {
+            htmlString += `
+                <div class="product-card bg-white shadow-md rounded-lg overflow-hidden transition-transform hover:scale-105 duration-300">
+                    ${item.fields.photo_url ? `<img src="${item.fields.photo_url}" alt="${item.fields.name}" class="product-image w-full h-48 object-cover rounded-t-lg">` : `<p class="text-center text-gray-400 mb-4">No image available</p>`}
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">${item.fields.name}</h3>
+                        <p class="text-gray-600 text-sm mb-4"><strong>Description:</strong> ${item.fields.description}</p>
+                        <p class="text-gray-900 text-lg font-bold"><strong>Price:</strong> ${item.fields.price}</p>
+                    </div>
+                    <div class="flex justify-between px-6 pb-6">
+                        <a href="/edit-product/${item.pk}" class="text-white bg-black py-2 px-4 rounded-lg hover:bg-gray-800 transition">Edit</a>
+                        <a href="/delete-product/${item.pk}" class="text-white bg-red-500 py-2 px-4 rounded-lg hover:bg-red-600 transition">Delete</a>
+                    </div>
+                </div>
+            `;
+        });
+    }
+    document.getElementById("item_entry_cards").className = classNameString;
+    document.getElementById("item_entry_cards").innerHTML = htmlString;
+  }
+  refreshItemEntries();  
+```
 </details>
