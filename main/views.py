@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import login_required
 import datetime
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from django.utils.html import strip_tags
 
 @login_required(login_url='/register')
 def show_main(request):
@@ -91,10 +92,10 @@ def create_add_item(request):
 @require_POST
 def add_item_entry_ajax(request):
     if request.user.is_authenticated:
-        name = request.POST.get("name")
-        photo_url = request.POST.get("photo_url")
-        price = request.POST.get("price")
-        description = request.POST.get("description")
+        name = strip_tags(request.POST.get("name"))
+        photo_url = strip_tags(request.POST.get("photo_url"))
+        price = strip_tags(request.POST.get("price"))
+        description = strip_tags(request.POST.get("description"))
 
         # Pastikan user diset pada item yang dibuat
         new_item = AddItem(
